@@ -1,18 +1,12 @@
-//
-//  LogEntry.m
-//  LogWebSDK
-//
-
 #import "LogEntry.h"
 
 @implementation LLWLogEntry
 
-- (instancetype)initWithLevel:(LLWLogLevel)level message:(NSString *)message tag:(nullable NSString *)tag {
+- (instancetype)initWithLevel:(LLWLogLevel)level
+                      message:(NSString *)message {
     if (self = [super init]) {
-        _level = level;
-        _message = [message copy];
-        _timestamp = [NSDate date];
-        _tag = [tag copy];
+        _level     = level;
+        _message   = [message copy];
     }
     return self;
 }

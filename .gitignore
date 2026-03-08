@@ -3,8 +3,8 @@ Pods/
 Podfile.lock
 
 # Xcode
-*.xcodeproj/xcuserdata/
-*.xcworkspace/xcuserdata/
+**/*.xcodeproj/xcuserdata/
+**/*.xcworkspace/xcuserdata/
 DerivedData/
 *.hmap
 *.ipa

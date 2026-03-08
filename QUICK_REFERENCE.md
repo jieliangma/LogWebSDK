@@ -72,12 +72,6 @@ http://<device-ip>:8080
 [LogWebSDK startWithPort:9000];
 ```
 
-### 调整缓冲区
-
-```objc
-[[LLWLogBuffer sharedInstance] setMaxBufferSize:2000];
-```
-
 ### 禁用自动启动
 
 在 Info.plist 中添加：
@@ -121,7 +115,6 @@ LogWebSDK
 ├── DDWebSocketLogger      # CocoaLumberjack Logger
 ├── LLWLogBuffer          # 线程安全缓冲区
 ├── LLWLogWebServer       # HTTP/WebSocket 服务器
-├── LLWLogBroadcastService # Bonjour 服务
 └── LogViewer.html        # Web UI
 ```
 
@@ -162,17 +155,6 @@ LogWebSDK
 + (BOOL)isStarted;
 ```
 
-### LLWLogBuffer
-
-```objc
-+ (instancetype)sharedInstance;
-@property NSUInteger maxBufferSize;
-@property (readonly) NSUInteger count;
-- (void)addLogEntry:(LLWLogEntry *)entry;
-- (NSArray *)getAllLogs;
-- (void)clear;
-```
-
 ### LLWLogWebServer
 
 ```objc
@@ -183,17 +165,6 @@ LogWebSDK
 - (void)stop;
 - (void)broadcastLog:(LLWLogEntry *)entry;
 ```
-
-### LLWLogBroadcastService
-
-```objc
-+ (instancetype)sharedInstance;
-@property NSString *serviceName;
-@property NSString *serviceType;
-- (BOOL)publishWithPort:(NSInteger)port error:(NSError **)error;
-- (void)stopPublishing;
-```
-
 ---
 
 **更多详细信息请查看 README.md**

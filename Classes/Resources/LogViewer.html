@@ -40,13 +40,14 @@
             font-size: 18px;
             color: #e94560;
             margin-right: 20px;
+            flex-shrink: 0;
         }
 
         .filter-group {
             display: flex;
             gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
 
         .filter-select {
@@ -57,7 +58,7 @@
             color: #eee;
             font-size: 12px;
             cursor: pointer;
-            min-width: 120px;
+            min-width: 80px;
         }
 
         .filter-select:focus {
@@ -65,52 +66,42 @@
             border-color: #e94560;
         }
 
-        .filter-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
-            background: #0f3460;
-            color: #fff;
-        }
-
-        .filter-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
-        }
-
-        .filter-btn.active {
-            background: #e94560;
-        }
-
-        .filter-btn[data-level="0"] { border-left: 3px solid #6c757d; }
-        .filter-btn[data-level="1"] { border-left: 3px solid #17a2b8; }
-        .filter-btn[data-level="2"] { border-left: 3px solid #28a745; }
-        .filter-btn[data-level="3"] { border-left: 3px solid #ffc107; }
-        .filter-btn[data-level="4"] { border-left: 3px solid #dc3545; }
-
         .search-box {
             flex: 1;
-            max-width: 400px;
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .search-box input {
-            width: 100%;
+        .search-box input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #e94560;
+        }
+
+        .search-box input[type="text"] {
+            flex: 1;
             padding: 6px 12px;
             border: 1px solid #0f3460;
             border-radius: 4px;
             background: #1a1a2e;
             color: #eee;
             font-size: 12px;
+            transition: border-color 0.2s;
         }
 
-        .search-box input:focus {
+        .search-box input[type="text"]:focus {
             outline: none;
             border-color: #e94560;
+        }
+
+        /* 正则错误状态 */
+        .search-box input[type="text"].regex-error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
         }
 
         .action-btn {
@@ -121,6 +112,7 @@
             font-size: 12px;
             font-weight: 500;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
 
         .btn-clear {
@@ -138,6 +130,7 @@
             gap: 6px;
             font-size: 12px;
             color: #aaa;
+            flex-shrink: 0;
         }
 
         .status-dot {
@@ -145,6 +138,7 @@
             height: 8px;
             border-radius: 50%;
             background: #6c757d;
+            flex-shrink: 0;
         }
 
         .status-dot.connected {
@@ -160,104 +154,64 @@
         .log-container {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 0;
             background: #0f0f1e;
         }
 
         .log-entry {
             font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             font-size: 12px;
-            padding: 6px 10px;
-            margin-bottom: 4px;
-            border-radius: 3px;
+            padding: 2px 4px;
             border-left: 3px solid transparent;
-            line-height: 1.5;
             word-break: break-all;
-            transition: background 0.1s;
+            white-space: pre-wrap;
         }
 
         .log-entry:hover {
-            background: #1a1a2e;
+            background: #1a1a2e !important;
         }
 
-        .log-entry.verbose { border-left-color: #6c757d; background: rgba(108, 117, 125, 0.1); }
-        .log-entry.debug { border-left-color: #17a2b8; background: rgba(23, 162, 184, 0.1); }
-        .log-entry.info { border-left-color: #28a745; background: rgba(40, 167, 69, 0.1); }
-        .log-entry.warning { border-left-color: #ffc107; background: rgba(255, 193, 7, 0.1); }
-        .log-entry.error { border-left-color: #dc3545; background: rgba(220, 53, 69, 0.1); }
+        .log-entry.verbose { border-left-color: #6c757d; background: rgba(108, 117, 125, 0.08); }
+        .log-entry.debug   { border-left-color: #17a2b8; background: rgba(23, 162, 184, 0.08); }
+        .log-entry.info    { border-left-color: #28a745; background: rgba(40, 167, 69, 0.08); }
+        .log-entry.warning { border-left-color: #ffc107; background: rgba(255, 193, 7, 0.08); }
+        .log-entry.error   { border-left-color: #dc3545; background: rgba(220, 53, 69, 0.08); }
 
-        .log-timestamp {
-            color: #6c757d;
-            margin-right: 8px;
-            font-size: 11px;
-        }
-
-        .log-level {
-            font-weight: bold;
-            margin-right: 8px;
-            min-width: 70px;
-            display: inline-block;
-        }
-
-        .log-tag {
-            color: #e94560;
-            margin-right: 8px;
-            font-size: 11px;
-        }
-
-        .log-message {
-            color: #eee;
-        }
-
-        .log-entry.verbose .log-level { color: #6c757d; }
-        .log-entry.debug .log-level { color: #17a2b8; }
-        .log-entry.info .log-level { color: #28a745; }
-        .log-entry.warning .log-level { color: #ffc107; }
-        .log-entry.error .log-level { color: #dc3545; }
-
-        /* 底部状态栏 */
-        .status-bar {
-            background: #16213e;
-            padding: 8px 20px;
-            border-top: 2px solid #0f3460;
-            display: flex;
-            justify-content: space-between;
+        /* 滚动到底部按钮 */
+        .scroll-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 24px;
+            background: #e94560;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
             font-size: 12px;
-            color: #aaa;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+
+        .scroll-btn:hover {
+            background: #c73652;
         }
 
         /* 滚动条样式 */
-        .log-container::-webkit-scrollbar {
-            width: 10px;
-        }
+        .log-container::-webkit-scrollbar { width: 8px; }
+        .log-container::-webkit-scrollbar-track { background: #1a1a2e; }
+        .log-container::-webkit-scrollbar-thumb { background: #0f3460; border-radius: 4px; }
+        .log-container::-webkit-scrollbar-thumb:hover { background: #e94560; }
 
-        .log-container::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-
-        .log-container::-webkit-scrollbar-thumb {
-            background: #0f3460;
-            border-radius: 5px;
-        }
-
-        .log-container::-webkit-scrollbar-thumb:hover {
-            background: #e94560;
-        }
-
-        /* 响应式设计 */
+        /* 响应式 */
         @media (max-width: 768px) {
             .toolbar {
                 flex-wrap: wrap;
                 gap: 10px;
             }
-
-            .filter-group {
-                flex-wrap: wrap;
-            }
-
             .search-box {
                 order: 3;
-                max-width: 100%;
                 flex-basis: 100%;
             }
         }
@@ -268,279 +222,284 @@
         <!-- 工具栏 -->
         <div class="toolbar">
             <h1>📊 LogWebSDK</h1>
-            
+
             <div class="filter-group">
                 <select class="filter-select" id="levelFilter">
-                    <option value="all">显示所有级别</option>
                     <option value="0">Verbose</option>
-                    <option value="1">Debug</option>
+                    <option value="1" selected>Debug</option>
                     <option value="2">Info</option>
                     <option value="3">Warning</option>
                     <option value="4">Error</option>
                 </select>
             </div>
-            
+
             <div class="search-box">
-                <input type="text" id="regexInput" placeholder="正则表达式过滤...">
+                <input type="checkbox" id="regexToggle">
+                <input type="text" id="regexInput" placeholder="勾选选框，可以使用正则表达式">
             </div>
-            
+
             <button class="action-btn btn-clear" onclick="clearLogs()">清空日志</button>
-            
+
             <div class="connection-status">
                 <div class="status-dot" id="statusDot"></div>
                 <span id="statusText">连接中...</span>
             </div>
         </div>
-        
+
         <!-- 日志显示区 -->
-        <div class="log-container" id="logContainer">
-            <!-- 日志条目将动态插入到这里 -->
-        </div>
-        
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <span id="logCount">日志数：0</span>
-            <span id="serverInfo">服务器：<span id="serverUrl">-</span></span>
-        </div>
+        <div class="log-container" id="logContainer"></div>
     </div>
 
+    <!-- 回到底部按钮（用户上滚后显示） -->
+    <button class="scroll-btn" id="scrollBtn" onclick="scrollToBottom()">↓ 回到底部</button>
+
     <script>
-        // WebSocket 连接
-        let ws = null;
-        let reconnectAttempts = 0;
-        const maxReconnectAttempts = 10;
-        const reconnectDelay = 2000; // 2 秒后首次重连
-        
-        // 日志过滤设置
-        let selectedLevel = 'all'; // 默认显示所有级别
-        let regexFilter = null;
-        
-        // 日志统计
-        let logCount = 0;
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            updateServerInfo();
+        // ========== 配置 ==========
+        const CONFIG = {
+            MAX_LOG_ENTRIES:        100000, // 超过此数量移除最旧的条目
+            MAX_RECONNECT_ATTEMPTS: 999,
+            INITIAL_RECONNECT_DELAY: 1000,
+            MAX_RECONNECT_DELAY:    30000,
+            REGEX_DEBOUNCE_DELAY:   300,
+            SCROLL_BOTTOM_THRESHOLD: 50     // px，距底部多近视为"已在底部"
+        };
+
+        // ========== 状态 ==========
+        let state = {
+            ws: null,
+            reconnectAttempts: 0,
+            selectedLevel: '1',
+            regexFilter: null,
+            // 所有日志的原始数据（用于过滤器变更时重新渲染）
+            allLogs: []
+        };
+
+        // ========== DOM 缓存 ==========
+        const el = {};
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            el.logContainer = document.getElementById('logContainer');
+            el.levelFilter  = document.getElementById('levelFilter');
+            el.regexInput   = document.getElementById('regexInput');
+            el.regexToggle  = document.getElementById('regexToggle');
+            el.statusDot    = document.getElementById('statusDot');
+            el.statusText   = document.getElementById('statusText');
+            el.scrollBtn    = document.getElementById('scrollBtn');
+
             connectWebSocket();
             setupEventListeners();
         });
-        
-        // 更新服务器信息
-        function updateServerInfo() {
-            const url = window.location.host || 'localhost:8080';
-            document.getElementById('serverUrl').textContent = `http://${url}`;
-        }
-        
-        // 连接 WebSocket
+
+        // ========== WebSocket ==========
         function connectWebSocket() {
-            // 关键：使用当前页面的 host（手机 IP:端口）
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}/ws`;
-            
-            console.log('[LogWebSDK] Connecting to WebSocket:', wsUrl);
+            console.log('[LogWebSDK] Connecting to:', wsUrl);
             updateConnectionStatus('connecting');
-            
+
             try {
-                ws = new WebSocket(wsUrl);
-                
-                ws.onopen = function() {
-                    console.log('[LogWebSDK] WebSocket connected');
-                    reconnectAttempts = 0;
+                state.ws = new WebSocket(wsUrl);
+                state.ws.onopen = () => {
+                    console.log('[LogWebSDK] Connected');
+                    state.reconnectAttempts = 0;
                     updateConnectionStatus('connected');
                 };
-                
-                ws.onmessage = function(event) {
+                state.ws.onmessage = (event) => {
                     try {
-                        const logEntry = JSON.parse(event.data);
-                        addLogEntry(logEntry);
+                        const entry = JSON.parse(event.data);
+                        handleIncomingEntry(entry);
                     } catch (e) {
-                        console.error('[LogWebSDK] Failed to parse log entry:', e);
+                        console.error('[LogWebSDK] Parse error:', e);
                     }
                 };
-                
-                ws.onerror = function(error) {
-                    console.error('[LogWebSDK] WebSocket error:', error);
+                state.ws.onerror = (e) => {
+                    console.error('[LogWebSDK] WebSocket error:', e);
                 };
-                
-                ws.onclose = function() {
-                    console.log('[LogWebSDK] WebSocket closed');
+                state.ws.onclose = (event) => {
+                    console.log('[LogWebSDK] Closed:', event.code, event.reason);
                     updateConnectionStatus('disconnected');
                     scheduleReconnect();
                 };
-                
             } catch (e) {
                 console.error('[LogWebSDK] Failed to create WebSocket:', e);
                 updateConnectionStatus('disconnected');
                 scheduleReconnect();
             }
         }
-        
-        // 计划重连（指数退避）
+
         function scheduleReconnect() {
-            if (reconnectAttempts >= maxReconnectAttempts) {
-                console.log('[LogWebSDK] Max reconnect attempts reached');
-                return;
-            }
-            
-            const delay = Math.min(reconnectDelay * Math.pow(2, reconnectAttempts), 30000);
-            reconnectAttempts++;
-            
-            setTimeout(() => {
-                console.log(`[LogWebSDK] Reconnecting (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
-                connectWebSocket();
-            }, delay);
+            if (state.reconnectAttempts >= CONFIG.MAX_RECONNECT_ATTEMPTS) return;
+            const delay = Math.min(
+                CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(2, state.reconnectAttempts),
+                CONFIG.MAX_RECONNECT_DELAY
+            );
+            state.reconnectAttempts++;
+            console.log(`[LogWebSDK] Reconnect in ${delay / 1000}s (${state.reconnectAttempts})`);
+            setTimeout(connectWebSocket, delay);
         }
-        
-        // 更新连接状态
+
         function updateConnectionStatus(status) {
-            const dot = document.getElementById('statusDot');
-            const text = document.getElementById('statusText');
-            
-            dot.className = 'status-dot';
-            
+            el.statusDot.className = 'status-dot';
             switch (status) {
                 case 'connected':
-                    dot.classList.add('connected');
-                    text.textContent = '已连接';
+                    el.statusDot.classList.add('connected');
+                    el.statusText.textContent = '已连接';
                     break;
                 case 'connecting':
-                    text.textContent = '连接中...';
+                    el.statusText.textContent = '连接中...';
                     break;
                 case 'disconnected':
-                    dot.classList.add('disconnected');
-                    text.textContent = '已断开';
+                    el.statusDot.classList.add('disconnected');
+                    el.statusText.textContent = '已断开';
                     break;
             }
         }
-        
-        // 添加日志条目
-        function addLogEntry(entry) {
-            // 检查日志级别过滤
-            if (selectedLevel !== 'all' && entry.level.toString() !== selectedLevel) {
-                return;
+
+        // ========== 日志处理 ==========
+
+        // 接收新日志：存到 allLogs，按当前过滤条件决定是否渲染
+        function handleIncomingEntry(entry) {
+            state.allLogs.push(entry);
+
+            // 超过上限时裁剪旧数据（同步裁剪 DOM）
+            if (state.allLogs.length > CONFIG.MAX_LOG_ENTRIES) {
+                const overflow = state.allLogs.length - CONFIG.MAX_LOG_ENTRIES;
+                state.allLogs.splice(0, overflow);
+                // 同步移除 DOM 最旧的条目（包括隐藏的）
+                const allDomEntries = el.logContainer.querySelectorAll('.log-entry');
+                for (let i = 0; i < Math.min(overflow, allDomEntries.length); i++) {
+                    allDomEntries[i].remove();
+                }
             }
-            
-            // 检查正则表达式过滤
-            if (regexFilter && !regexFilter.test(entry.message)) {
-                return;
-            }
-            
-            const container = document.getElementById('logContainer');
-            const logDiv = document.createElement('div');
-            logDiv.className = `log-entry ${entry.levelStr.toLowerCase()}`;
-            
-            const time = new Date(entry.timestamp).toLocaleTimeString('zh-CN', { 
-                hour12: false, 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                fractionalSecondDigits: 3
-            });
-            
-            logDiv.innerHTML = `
-                <span class="log-timestamp">${time}</span>
-                <span class="log-level">${entry.levelStr}</span>
-                <span class="log-tag">[${entry.tag}]</span>
-                <span class="log-message">${escapeHtml(entry.message)}</span>
-            `;
-            
-            container.appendChild(logDiv);
-            logCount++;
-            updateLogCount();
-            
-            // 自动滚动到底部
-            scrollToBottom();
+
+            const wasAtBottom = isAtBottom();
+            const node = createLogNode(entry);
+
+            const fullText = getFullText(entry);
+            const levelMatch = entry.level >= parseInt(state.selectedLevel);
+            const textMatch  = matchesFilter(fullText);
+            node.style.display = (levelMatch && textMatch) ? '' : 'none';
+
+            el.logContainer.appendChild(node);
+
+            // Fix #6：只有用户本来就在底部时才自动滚动
+            if (wasAtBottom) scrollToBottom();
+
+            // 显示/隐藏回到底部按钮
+            updateScrollButton();
         }
-        
-        // 转义 HTML
-        function escapeHtml(text) {
+
+        // Fix #2：用 textContent 赋值，彻底消除 XSS
+        // 不再使用 innerHTML 拼接，tag/timestamp/message 均通过 textContent 插入
+        function createLogNode(entry) {
             const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            div.className = `log-entry ${getLevelClass(entry.level)}`;
+            // textContent 赋值天然安全，无需 escapeHtml
+            div.textContent = `${entry.message}`;
+            return div;
         }
-        
-        // 滚动到底部
+
+        // 获取条目的完整文本（过滤器统一用此字符串）
+        function getFullText(entry) {
+            return `${entry.message}`;
+        }
+
+        function getLevelClass(level) {
+            return ['verbose', 'debug', 'info', 'warning', 'error'][level] || 'info';
+        }
+
+        // ========== 过滤器 ==========
+
+        // 过滤器变更：重新遍历 DOM，按当前条件 show/hide
+        function applyFilter() {
+            const minLevel = parseInt(state.selectedLevel);
+            el.logContainer.querySelectorAll('.log-entry').forEach(node => {
+                const text = node.textContent;
+                const level = getLevelNumber(node);
+                const levelMatch = level >= minLevel;
+                const textMatch = matchesFilter(text);
+                node.style.display = (levelMatch && textMatch) ? '' : 'none';
+            });
+        }
+
+        function matchesFilter(text) {
+            const keyword = el.regexInput.value.trim();
+            if (!keyword) return true;
+            if (el.regexToggle.checked) {
+                return state.regexFilter ? state.regexFilter.test(text) : true;
+            }
+            return text.includes(keyword);
+        }
+
+        // 从 CSS 类名反推 level 数字
+        function getLevelNumber(node) {
+            const map = { verbose: 0, debug: 1, info: 2, warning: 3, error: 4 };
+            for (const cls of node.classList) {
+                if (cls in map) return map[cls];
+            }
+            return 0;
+        }
+
+        // ========== 滚动 ==========
+
+        function isAtBottom() {
+            const c = el.logContainer;
+            return c.scrollHeight - c.scrollTop - c.clientHeight < CONFIG.SCROLL_BOTTOM_THRESHOLD;
+        }
+
         function scrollToBottom() {
-            const container = document.getElementById('logContainer');
-            container.scrollTop = container.scrollHeight;
+            el.logContainer.scrollTop = el.logContainer.scrollHeight;
         }
-        
-        // 更新日志计数
-        function updateLogCount() {
-            document.getElementById('logCount').textContent = `日志数：${logCount}`;
+
+        function updateScrollButton() {
+            el.scrollBtn.style.display = isAtBottom() ? 'none' : 'block';
         }
-        
-        // 清空日志
+
+        // ========== 清空 ==========
         function clearLogs() {
-            fetch('/clear', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('logContainer').innerHTML = '';
-                        logCount = 0;
-                        updateLogCount();
-                    }
-                })
-                .catch(err => console.error('[LogWebSDK] Clear failed:', err));
+            el.logContainer.innerHTML = '';
+            state.allLogs = [];
+            el.scrollBtn.style.display = 'none';
         }
-        
-        // 设置事件监听
+
+        // ========== 事件监听 ==========
         function setupEventListeners() {
-            // 日志级别下拉框
-            const levelFilter = document.getElementById('levelFilter');
-            levelFilter.addEventListener('change', function() {
-                selectedLevel = this.value;
-                filterDisplayedLogs();
+            el.levelFilter.addEventListener('change', function () {
+                state.selectedLevel = this.value;
+                applyFilter();
             });
-            
-            // 正则表达式输入框
-            const regexInput = document.getElementById('regexInput');
-            let regexTimeout = null;
-            
-            regexInput.addEventListener('input', function() {
-                clearTimeout(regexTimeout);
-                
-                // 防抖，500ms 后更新
-                regexTimeout = setTimeout(() => {
-                    const value = this.value.trim();
-                    try {
-                        regexFilter = value ? new RegExp(value) : null;
-                        filterDisplayedLogs();
-                    } catch (e) {
-                        console.error('[LogWebSDK] Invalid regex:', e);
-                        regexFilter = null;
+
+            el.regexToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    el.regexInput.placeholder = '取消选框，不使用正则表达式';
+                } else {
+                    el.regexInput.placeholder = '勾选选框，可以使用正则表达式';
+                    el.regexInput.classList.remove('regex-error');
+                    state.regexFilter = null;
+                }
+                applyFilter();
+            });
+
+            let regexTimer = null;
+            el.regexInput.addEventListener('input', function () {
+                clearTimeout(regexTimer);
+                regexTimer = setTimeout(() => {
+                    if (el.regexToggle.checked) {
+                        const value = this.value.trim();
+                        try {
+                            state.regexFilter = value ? new RegExp(value) : null;
+                            el.regexInput.classList.remove('regex-error');
+                        } catch (e) {
+                            el.regexInput.classList.add('regex-error');
+                            state.regexFilter = null;
+                        }
                     }
-                }, 500);
+                    applyFilter();
+                }, CONFIG.REGEX_DEBOUNCE_DELAY);
             });
-        }
-        
-        // 过滤已显示的日志
-        function filterDisplayedLogs() {
-            const container = document.getElementById('logContainer');
-            const logEntries = container.querySelectorAll('.log-entry');
-            
-            logEntries.forEach(entry => {
-                const levelStr = entry.querySelector('.log-level').textContent;
-                const message = entry.querySelector('.log-message').textContent;
-                
-                // 转换为级别数字
-                const levelMap = {
-                    'VERBOSE': 0,
-                    'DEBUG': 1,
-                    'INFO': 2,
-                    'WARN': 3,
-                    'ERROR': 4
-                };
-                const level = levelMap[levelStr];
-                
-                // 检查级别过滤
-                const levelMatch = (selectedLevel === 'all') || (level.toString() === selectedLevel);
-                
-                // 检查正则过滤
-                const regexMatch = !regexFilter || regexFilter.test(message);
-                
-                entry.style.display = (levelMatch && regexMatch) ? '' : 'none';
-            });
+
+            el.logContainer.addEventListener('scroll', updateScrollButton, { passive: true });
         }
     </script>
 </body>

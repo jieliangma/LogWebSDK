@@ -9,6 +9,6 @@ target 'LogWebSDK_Example' do
   # 或者使用发布版本
   # pod 'LogWebSDK'
   
-  pod 'CocoaLumberjack'
+  pod 'CocoaLumberjack', '3.5.1'
   
 end
