@@ -32,6 +32,8 @@ static NSInteger _currentPort = 8080;
 
     _started     = YES;
     _currentPort = port;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"LLWLogWebSDKDidStart"
+                                                        object:@(port)];
     return YES;
 }
 
@@ -39,15 +41,16 @@ static NSInteger _currentPort = 8080;
     if (!_started) return;
     [DDLog removeLogger:[DDWebSocketLogger sharedInstance]];
     [[LLWLogWebServer sharedInstance] stop];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"LLWLogWebSDKDidStop" object:nil];
     _started = NO;
 }
 
 + (NSDictionary *)configuration {
     return @{
-        @"version":          LOGWEB_VERSION,
-        @"started":          @(_started),
-        @"port":             @(_currentPort),
-        @"webServerRunning": @([LLWLogWebServer sharedInstance].isRunning)
+        @"version": LOGWEB_VERSION,
+        @"started": @(_started),
+        @"port":    @(_currentPort),
+        @"webServerRunning": @([LLWLogWebServer sharedInstance].isRunning),
     };
 }
 
@@ -79,3 +82,4 @@ static NSInteger _currentPort = 8080;
 }
 
 @end
+

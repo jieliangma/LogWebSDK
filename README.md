@@ -18,9 +18,18 @@
 
 ## 📦 安装
 
+### 默认支持 Web 查看器和 NSLogger
+
 ```ruby
 # 推荐仅在 Debug 模式下启用，Release 包不含 SDK
 pod 'LogWebSDK', :configurations => ['Debug']
+```
+
+### 基础版只支持 Web 查看器
+
+```ruby
+# 不支持 NSLogger Viewer（macOS 桌面应用）
+pod 'LogWebSDK/Core', :configurations => ['Debug']
 ```
 
 然后执行：
@@ -71,7 +80,7 @@ http://<设备 IP>:8080
 [LogWebSDK stop];
 
 NSDictionary *config = [LogWebSDK configuration];
-// 包含 key: version, started, port, webServerRunning, bonjourPublishing
+// 包含 key: version, started, port, webServerRunning
 ```
 
 ### 禁用自动启动
@@ -97,16 +106,50 @@ DDLogWarn(@"Warning message");
 DDLogError(@"Error message");
 ```
 
+## 🔌 NSLogger 集成（可选）
+
+如果安装了 `LogWebSDK/NSLogger` 子组件，可以同时支持 NSLogger Viewer。
+
+### 使用方式
+
+安装后无需编写任何代码，NSLogger 会自动发现设备并接收日志。
+
+**macOS 端：**
+1. 下载并打开 [NSLogger Viewer](https://github.com/fpillet/NSLogger)
+2. 设置 NSLogger 的 Bonjour 服务名。服务名会在控制台打印，搜索“LogWebSDK - NSLogger”可查找到。
+3. 应用启动后，NSLogger 会自动发现 iOS 设备
+4. 在左侧边栏选择设备即可查看实时日志
+
+**特点：**
+- ✅ 原生 macOS 应用，性能优秀
+- ✅ 支持多设备同时监控
+- ✅ 丰富的过滤和搜索功能
+- ✅ 支持图形化显示日志统计
+
 ## ⚙️ Info.plist 配置
 
-SDK 通过 CocoaPods `info_plist` 自动向宿主 App 注入以下配置，无需手动添加：
+**注意：** 需要在宿主应用的 Info.plist 中手动添加以下配置（CocoaPods 不会自动注入）：
 
 ```xml
+<!-- 宿主应用的 Info.plist -->
 <key>NSLocalNetworkUsageDescription</key>
 <string>用于在局域网内提供日志查看服务</string>
+
 <key>NSBonjourServices</key>
 <array>
-    <string>_ioslog._tcp</string>
+    <string>_ioslog._tcp</string>      <!-- WebSocket 日志查看器 -->
+</array>
+```
+
+### NSLogger 版本
+
+如果使用了 `LogWebSDK/NSLogger` 子组件，需要在 Info.plist 中额外添加 NSLogger 的 Bonjour 服务：
+
+```xml
+<key>NSBonjourServices</key>
+<array>
+    <string>_ioslog._tcp</string>      <!-- WebSocket 日志查看器 -->
+    <string>_nslogger._tcp</string>    <!-- NSLogger macOS Viewer -->
 </array>
 ```
 

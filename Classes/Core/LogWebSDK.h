@@ -15,6 +15,9 @@ FOUNDATION_EXPORT const unsigned char LogWebSDKVersionString[];
 #import "LogEntry.h"
 #import "DDWebSocketLogger.h"
 #import "LogWebServer.h"
+#if __has_include(<NSLogger/NSLogger.h>)
+    #import "LLWNSLogger.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
