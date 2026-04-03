@@ -1,0 +1,81 @@
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Xcode
+**/*.xcodeproj/xcuserdata/
+**/*.xcworkspace/xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Build products
+build/
+*.app
+*.framework
+*.dylib
+*.so
+
+# User settings
+*.perspectivev3
+*.xccheckout
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+*.mode2v3
+*.project
+
+# Plugin generated files
+*.playground
+xcshareddata/
+.swiftenv
+
+# Carthage
+Carthage/Build/
+
+# Swift Package Manager
+Packages/
+Package.resolved
+.build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+*.gcno
+*.gcda
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Lingma IDE
+.lingma/agents/
+.lingma/skills/
+
+# Other
+.env
+*.pem
+*.key

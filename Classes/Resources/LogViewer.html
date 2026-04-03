@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogWebSDK - 实时日志查看器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* 顶部工具栏 */
+        .toolbar {
+            background: #16213e;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #0f3460;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .toolbar h1 {
+            font-size: 18px;
+            color: #e94560;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            background: #1a1a2e;
+            color: #eee;
+            font-size: 12px;
+            cursor: pointer;
+            min-width: 80px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #e94560;
+        }
+
+        .search-box input[type="text"] {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            background: #1a1a2e;
+            color: #eee;
+            font-size: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input[type="text"]:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        /* 正则错误状态 */
+        .search-box input[type="text"].regex-error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+        }
+
+        .action-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c82333;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6c757d;
+            flex-shrink: 0;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+            box-shadow: 0 0 8px #28a745;
+        }
+
+        .status-dot.disconnected {
+            background: #dc3545;
+        }
+
+        /* 日志显示区域 */
+        .log-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            background: #0f0f1e;
+        }
+
+        .log-entry {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            padding: 2px 4px;
+            border-left: 3px solid transparent;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .log-entry:hover {
+            background: #1a1a2e !important;
+        }
+
+        .log-entry.verbose { border-left-color: #6c757d; background: rgba(108, 117, 125, 0.08); }
+        .log-entry.debug   { border-left-color: #17a2b8; background: rgba(23, 162, 184, 0.08); }
+        .log-entry.info    { border-left-color: #28a745; background: rgba(40, 167, 69, 0.08); }
+        .log-entry.warning { border-left-color: #ffc107; background: rgba(255, 193, 7, 0.08); }
+        .log-entry.error   { border-left-color: #dc3545; background: rgba(220, 53, 69, 0.08); }
+
+        /* 滚动到底部按钮 */
+        .scroll-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 24px;
+            background: #e94560;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+
+        .scroll-btn:hover {
+            background: #c73652;
+        }
+
+        /* 滚动条样式 */
+        .log-container::-webkit-scrollbar { width: 8px; }
+        .log-container::-webkit-scrollbar-track { background: #1a1a2e; }
+        .log-container::-webkit-scrollbar-thumb { background: #0f3460; border-radius: 4px; }
+        .log-container::-webkit-scrollbar-thumb:hover { background: #e94560; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .search-box {
+                order: 3;
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <h1>📊 LogWebSDK</h1>
+
+            <div class="filter-group">
+                <select class="filter-select" id="levelFilter">
+                    <option value="0">Verbose</option>
+                    <option value="1" selected>Debug</option>
+                    <option value="2">Info</option>
+                    <option value="3">Warning</option>
+                    <option value="4">Error</option>
+                </select>
+            </div>
+
+            <div class="search-box">
+                <input type="checkbox" id="regexToggle">
+                <input type="text" id="regexInput" placeholder="勾选单选框，可以使用正则表达式">
+            </div>
+
+            <button class="action-btn btn-clear" onclick="clearLogs()">清空日志</button>
+
+            <div class="connection-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">连接中...</span>
+            </div>
+        </div>
+
+        <!-- 日志显示区 -->
+        <div class="log-container" id="logContainer"></div>
+    </div>
+
+    <!-- 回到底部按钮（用户上滚后显示） -->
+    <button class="scroll-btn" id="scrollBtn" onclick="scrollToBottom()">↓ 回到底部</button>
+
+    <script>
+        // ========== 配置 ==========
+        const CONFIG = {
+            MAX_LOG_ENTRIES:        100000, // 超过此数量移除最旧的条目
+            MAX_RECONNECT_ATTEMPTS: 999,
+            INITIAL_RECONNECT_DELAY: 1000,
+            MAX_RECONNECT_DELAY:    30000,
+            REGEX_DEBOUNCE_DELAY:   300,
+            SCROLL_BOTTOM_THRESHOLD: 50     // px，距底部多近视为"已在底部"
+        };
+
+        // ========== 状态 ==========
+        let state = {
+            ws: null,
+            reconnectAttempts: 0,
+            selectedLevel: '1',
+            regexFilter: null,
+            // 所有日志的原始数据（用于过滤器变更时重新渲染）
+            allLogs: []
+        };
+
+        // ========== DOM 缓存 ==========
+        const el = {};
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            el.logContainer = document.getElementById('logContainer');
+            el.levelFilter  = document.getElementById('levelFilter');
+            el.regexInput   = document.getElementById('regexInput');
+            el.regexToggle  = document.getElementById('regexToggle');
+            el.statusDot    = document.getElementById('statusDot');
+            el.statusText   = document.getElementById('statusText');
+            el.scrollBtn    = document.getElementById('scrollBtn');
+
+            connectWebSocket();
+            setupEventListeners();
+        });
+
+        // ========== WebSocket ==========
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            console.log('[LogWebSDK] Connecting to:', wsUrl);
+            updateConnectionStatus('connecting');
+
+            try {
+                state.ws = new WebSocket(wsUrl);
+                state.ws.onopen = () => {
+                    console.log('[LogWebSDK] Connected');
+                    state.reconnectAttempts = 0;
+                    updateConnectionStatus('connected');
+                };
+                state.ws.onmessage = (event) => {
+                    try {
+                        const entry = JSON.parse(event.data);
+                        handleIncomingEntry(entry);
+                    } catch (e) {
+                        console.error('[LogWebSDK] Parse error:', e);
+                    }
+                };
+                state.ws.onerror = (e) => {
+                    console.error('[LogWebSDK] WebSocket error:', e);
+                };
+                state.ws.onclose = (event) => {
+                    console.log('[LogWebSDK] Closed:', event.code, event.reason);
+                    updateConnectionStatus('disconnected');
+                    scheduleReconnect();
+                };
+            } catch (e) {
+                console.error('[LogWebSDK] Failed to create WebSocket:', e);
+                updateConnectionStatus('disconnected');
+                scheduleReconnect();
+            }
+        }
+
+        function scheduleReconnect() {
+            if (state.reconnectAttempts >= CONFIG.MAX_RECONNECT_ATTEMPTS) return;
+            const delay = Math.min(
+                CONFIG.INITIAL_RECONNECT_DELAY * Math.pow(2, state.reconnectAttempts),
+                CONFIG.MAX_RECONNECT_DELAY
+            );
+            state.reconnectAttempts++;
+            console.log(`[LogWebSDK] Reconnect in ${delay / 1000}s (${state.reconnectAttempts})`);
+            setTimeout(connectWebSocket, delay);
+        }
+
+        function updateConnectionStatus(status) {
+            el.statusDot.className = 'status-dot';
+            switch (status) {
+                case 'connected':
+                    el.statusDot.classList.add('connected');
+                    el.statusText.textContent = '已连接';
+                    break;
+                case 'connecting':
+                    el.statusText.textContent = '连接中...';
+                    break;
+                case 'disconnected':
+                    el.statusDot.classList.add('disconnected');
+                    el.statusText.textContent = '已断开';
+                    break;
+            }
+        }
+
+        // ========== 日志处理 ==========
+
+        // 接收新日志：存到 allLogs，按当前过滤条件决定是否渲染
+        function handleIncomingEntry(entry) {
+            state.allLogs.push(entry);
+
+            // 超过上限时裁剪旧数据（同步裁剪 DOM）
+            if (state.allLogs.length > CONFIG.MAX_LOG_ENTRIES) {
+                const overflow = state.allLogs.length - CONFIG.MAX_LOG_ENTRIES;
+                state.allLogs.splice(0, overflow);
+                // 同步移除 DOM 最旧的条目（包括隐藏的）
+                const allDomEntries = el.logContainer.querySelectorAll('.log-entry');
+                for (let i = 0; i < Math.min(overflow, allDomEntries.length); i++) {
+                    allDomEntries[i].remove();
+                }
+            }
+
+            const wasAtBottom = isAtBottom();
+            const node = createLogNode(entry);
+
+            const fullText = getFullText(entry);
+            const levelMatch = entry.level >= parseInt(state.selectedLevel);
+            const textMatch  = matchesFilter(fullText);
+            node.style.display = (levelMatch && textMatch) ? '' : 'none';
+
+            el.logContainer.appendChild(node);
+
+            // Fix #6：只有用户本来就在底部时才自动滚动
+            if (wasAtBottom) scrollToBottom();
+
+            // 显示/隐藏回到底部按钮
+            updateScrollButton();
+        }
+
+        // Fix #2：用 textContent 赋值，彻底消除 XSS
+        // 不再使用 innerHTML 拼接，tag/timestamp/message 均通过 textContent 插入
+        function createLogNode(entry) {
+            const div = document.createElement('div');
+            div.className = `log-entry ${getLevelClass(entry.level)}`;
+            // textContent 赋值天然安全，无需 escapeHtml
+            div.textContent = `${entry.message}`;
+            return div;
+        }
+
+        // 获取条目的完整文本（过滤器统一用此字符串）
+        function getFullText(entry) {
+            return `${entry.message}`;
+        }
+
+        function getLevelClass(level) {
+            return ['verbose', 'debug', 'info', 'warning', 'error'][level] || 'info';
+        }
+
+        // ========== 过滤器 ==========
+
+        // 过滤器变更：重新遍历 DOM，按当前条件 show/hide
+        function applyFilter() {
+            const minLevel = parseInt(state.selectedLevel);
+            el.logContainer.querySelectorAll('.log-entry').forEach(node => {
+                const text = node.textContent;
+                const level = getLevelNumber(node);
+                const levelMatch = level >= minLevel;
+                const textMatch = matchesFilter(text);
+                node.style.display = (levelMatch && textMatch) ? '' : 'none';
+            });
+        }
+
+        function matchesFilter(text) {
+            const keyword = el.regexInput.value.trim();
+            if (!keyword) return true;
+            if (el.regexToggle.checked) {
+                return state.regexFilter ? state.regexFilter.test(text) : true;
+            }
+            return text.includes(keyword);
+        }
+
+        // 从 CSS 类名反推 level 数字
+        function getLevelNumber(node) {
+            const map = { verbose: 0, debug: 1, info: 2, warning: 3, error: 4 };
+            for (const cls of node.classList) {
+                if (cls in map) return map[cls];
+            }
+            return 0;
+        }
+
+        // ========== 滚动 ==========
+
+        function isAtBottom() {
+            const c = el.logContainer;
+            return c.scrollHeight - c.scrollTop - c.clientHeight < CONFIG.SCROLL_BOTTOM_THRESHOLD;
+        }
+
+        function scrollToBottom() {
+            el.logContainer.scrollTop = el.logContainer.scrollHeight;
+        }
+
+        function updateScrollButton() {
+            el.scrollBtn.style.display = isAtBottom() ? 'none' : 'block';
+        }
+
+        // ========== 清空 ==========
+        function clearLogs() {
+            el.logContainer.innerHTML = '';
+            state.allLogs = [];
+            el.scrollBtn.style.display = 'none';
+        }
+
+        // ========== 事件监听 ==========
+        function setupEventListeners() {
+            el.levelFilter.addEventListener('change', function () {
+                state.selectedLevel = this.value;
+                applyFilter();
+            });
+
+            el.regexToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    el.regexInput.placeholder = '取消单选框，不使用正则表达式';
+                } else {
+                    el.regexInput.placeholder = '勾选单选框，可以使用正则表达式';
+                    el.regexInput.classList.remove('regex-error');
+                    state.regexFilter = null;
+                }
+                applyFilter();
+            });
+
+            let regexTimer = null;
+            el.regexInput.addEventListener('input', function () {
+                clearTimeout(regexTimer);
+                regexTimer = setTimeout(() => {
+                    if (el.regexToggle.checked) {
+                        const value = this.value.trim();
+                        try {
+                            state.regexFilter = value ? new RegExp(value) : null;
+                            el.regexInput.classList.remove('regex-error');
+                        } catch (e) {
+                            el.regexInput.classList.add('regex-error');
+                            state.regexFilter = null;
+                        }
+                    }
+                    applyFilter();
+                }, CONFIG.REGEX_DEBOUNCE_DELAY);
+            });
+
+            el.logContainer.addEventListener('scroll', updateScrollButton, { passive: true });
+        }
+    </script>
+</body>
+</html>
